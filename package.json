@@ -1,0 +1,13 @@
+{
+  "name": "JR-node-mongo1",
+  "version": "1.0.0",
+  "description": "test app for node and mongodb",
+  "main": "server.js",
+  "dependencies": {
+    "body-parser": "^1.14.1",
+    "express": "^4.13.3",
+    "finnhub": "^1.2.8",
+    "mongoose": "^4.2.4"
+  },
+  "author": "Jeff Rice"
+}
