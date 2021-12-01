@@ -1,7 +1,7 @@
 {
-  "name": "JR-node-mongo1",
+  "name": "JR-node-express",
   "version": "1.0.0",
-  "description": "test app for node and mongodb",
+  "description": "test app for node and express",
   "main": "server.js",
   "dependencies": {
     "body-parser": "^1.14.1",
