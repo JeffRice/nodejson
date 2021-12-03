@@ -44,14 +44,6 @@ http.createServer(jsonApp).listen(3030);
 
 
 //json get route - update for mongo
-jsonApp.get("/notes.json", function(req, res) {
-  Note.find({}, function (error, notes) {
-   //add some error checking...
-   res.json(notes);
-  });
-});
-
-//json get route - update for mongo
 jsonApp.get("/testNotes.json", function(req, res) {
   testNote.find({}, function (error, testNotes) {
    //add some error checking...
