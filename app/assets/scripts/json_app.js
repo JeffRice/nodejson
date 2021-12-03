@@ -2,22 +2,30 @@
 function loadApp() {
   "use strict";
 
-  function buildNote(response) {
-      //get travelNotes
-      var $travelNotes = response.travelNotes
-      //process travelNotes array
-      $travelNotes.forEach(function(item) {
-        if (item !== null) {
-          var note = item.note;
-          //create each note's <p>
-          var p = $("<p>");
-          //add note text
-          p.html(note);
-          //append to DOM
-          $(".note-output").append(p);
-        }
-      });
-  }
+
+function buildTestNotes(response) {
+  //get travelNotes
+  $(".note-output").empty();
+  console.log(response);
+  var $travelNotes = response;
+  //process travelNotes array
+  $travelNotes.forEach(function(item) {
+    console.log(item)
+    if (item !== null) {
+      var note = item.note;
+      var created = item.created;
+      //create each note's <p>
+      var p = $("<p>");
+      //add note text
+      p.html(note);
+      //append to DOM
+      $(".note-output").append(p);
+      $(".note-output").append('date item created: ' + created);
+      var hr = $("<hr />");
+      $(".note-output").append(hr);
+    }
+  });
+}
 
   function buildPortfolio(userAmount) {
     console.log(userAmount)
@@ -30,6 +38,8 @@ function loadApp() {
 
 
 
+
+
     $(".note-input button").on("click", function() {
       //get values for new note
       var note_text = $(".note-input input").val();
@@ -37,10 +47,11 @@ function loadApp() {
       //create new note
       var newNote = {"created":created, "note":note_text};
       //post new note to server
-      $.post("notes", newNote, function (response) {
-        console.log("server post response returned..." + JSON.stringify(response));
-        console.log(newNote);
+      $.post("testNotes", newNote, function (response) {
+        console.log("server post response returned..." + +JSON.stringify(response));
       })
+      //get notes
+      getTestNotes();
     });
 
     $("#upAmount").on("click", function() {
@@ -68,12 +79,21 @@ function loadApp() {
       buildPortfolio(userAmount);
     })
 
-    $.getJSON("notes.json", function (response) {
-      console.log("response = "+JSON.stringify(response));
-      console.log(response);
-      console.log(response.travelNotes);
-      buildNote(response);
-    })
+
+      function getTestNotes() {
+        $.getJSON("testNotes.json", function (response) {
+          console.log("response = "+JSON.stringify(response));
+          console.log(response);
+          console.log(response.travelNotes);
+          buildTestNotes(response);
+        });
+        }
+
+      //load notes on page load
+      getTestNotes();
+
+
+
 
 };
 $(document).ready(loadApp);

@@ -6,16 +6,24 @@ var express = require("express"),
     http = require("http"),
     bodyParser = require("body-parser"),
     jsonApp = express();
+    mongoose = require('mongoose');
+
+    var mongoDB = 'mongodb://127.0.0.1/testdb1';
+    mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true});
+  //  mongoose.connect('mongodb://localhost/424db1');
 
 
+  //define Mongoose schema for testnotes, using specific collection
+  var testNoteSchema = mongoose.Schema({
+    "created": Date,
+    "note": String
+  }, { collection : 'testNotes' });
 
 
-var notes = {
-  "travelNotes": [{
-  "created": "2015-10-12T00:00:00Z",
-  "note": "Curral das Freiras..."
-  }]
-};
+  //model note
+  var testNote = mongoose.model("testNote", testNoteSchema);
+
+
 
 var user = {
   "amount": 10000,
@@ -34,25 +42,47 @@ jsonApp.use(bodyParser.urlencoded({ extended: false }));
 //create http server
 http.createServer(jsonApp).listen(3030);
 
-//json get route
+
+//json get route - update for mongo
 jsonApp.get("/notes.json", function(req, res) {
-  res.json(notes);
+  Note.find({}, function (error, notes) {
+   //add some error checking...
+   res.json(notes);
+  });
 });
+
+//json get route - update for mongo
+jsonApp.get("/testNotes.json", function(req, res) {
+  testNote.find({}, function (error, testNotes) {
+   //add some error checking...
+   res.json(testNotes);
+  });
+});
+
 
 jsonApp.get("/user.json", function(req, res) {
   res.json(user);
 });
 
-jsonApp.post("/notes", function(req, res) {
-  //store new object in req.body
-  var newNote = req.body;
-  //push new note to JSON
-  notes["travelNotes"].push(newNote);
-  //return simple JSON object
-  res.json({
-    "message": "post complete to server"
+//json post route - update for MongoDB
+jsonApp.post("/testNotes", function(req, res) {
+  var newNote = new testNote({
+    "created":req.body.created,
+    "note":req.body.note
+  });
+  newNote.save(function (error, result) {
+    if (error !== null) {
+      console.log(error);
+      res.send("error reported");
+    } else {
+      testNote.find({}, function (error, result) {
+        res.json(result);
+      })
+    }
   });
 });
+
+
 
 jsonApp.put("/userAmount", function(req, res) {
   //store new object in req.body
