@@ -111,7 +111,7 @@ jsonApp.post("/testNotes", function(req, res) {
 //json post route - update for MongoDB
 jsonApp.post("/testUsers", function(req, res) {
   console.log(req.body)
-  
+
   portfolioObject = JSON.parse(req.body.portfolio);
   updatedAmount = Number(req.body.amount);
 
@@ -123,12 +123,23 @@ jsonApp.post("/testUsers", function(req, res) {
   console.log(updatedAmount)
 
   var newUserObject = { "amount":updatedAmount, 
-                        "portfolio":portfolioObject }
+                        "portfolio":portfolioObject, "userid": 1 }
 
   console.log(newUserObject)
-  res.json({
+
+  testUser.replaceOne(
+    { "userid": 1 },
     newUserObject
-  });
+  )
+
+
+  const query = { userid: 1 };
+
+  testUser.findOneAndUpdate(query, newUserObject, {upsert: true}, function(err, doc) {
+    if (err) return res.send(500, {error: err});
+    return res.send('Succesfully saved.');
+});
+ 
 
 });
 
