@@ -1,14 +1,10 @@
-/* a simple Express server for Node.js
-   comp 424 - appTest
-*/
-
 var express = require("express"),
     http = require("http"),
     bodyParser = require("body-parser"),
     jsonApp = express();
     mongoose = require('mongoose');
 
-    var mongoDB = 'mongodb://127.0.0.1/testdb1';
+    var mongoDB = 'mongodb://127.0.0.1/testdb2';
     mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true});
   //  mongoose.connect('mongodb://localhost/424db1');
 
@@ -17,19 +13,27 @@ var express = require("express"),
   var testNoteSchema = mongoose.Schema({
     "created": Date,
     "note": String
-  }, { collection : 'testNotes' });
+  }, { collection : 'testnotes' });
 
 
   //model note
   var testNote = mongoose.model("testNote", testNoteSchema);
 
+    //define Mongoose schema for testnotes, using specific collection
+    var testUserSchema = mongoose.Schema({
+      "userid": Number,
+      "amount": Number,
+      "portfolio": Array
+    }, { collection : 'testUsers' });
+  
+  
+    //model note
+    var testUser = mongoose.model("testUser", testUserSchema);
 
 
-var user = {
-  "amount": 10000,
-  "portfolio": [],
-  id: 0
-};
+  
+
+
 
 //set as static file server...
 jsonApp.use(express.static(__dirname + "/app"));
@@ -43,14 +47,43 @@ jsonApp.use(bodyParser.urlencoded({ extended: false }));
 http.createServer(jsonApp).listen(3030);
 
 
+testUser.find({}, function (error, testUsers) {
+  //add some error checking...
+  console.log(error)
+  console.log('testUsersEntry')
+  console.log(testUsers)
+}); 
+
+testNote.find({}, function (error, testNotes) {
+  //add some error checking...
+  numberOfEntries = testNotes.length;
+  console.log(numberOfEntries)
+  console.log('testNotes')
+  console.log(testNotes)
+  if(numberOfEntries === 0){
+    console.log('empty')
+  }
+  else {
+    console.log('have entries')
+  }
+ });
+
+
 //json get route - update for mongo
 jsonApp.get("/testNotes.json", function(req, res) {
-  testNote.find({}, function (error, testNotes) {
+  testNote.find({ }, function (error, testNotes) {
    //add some error checking...
    res.json(testNotes);
   });
 });
 
+//json get route - update for mongo
+jsonApp.get("/testUsers.json", function(req, res) {
+  testUser.find({}, function (error, testUsers) {
+   //add some error checking...
+   res.json(testUsers);
+  });
+});
 
 jsonApp.get("/user.json", function(req, res) {
   res.json(user);
@@ -75,6 +108,31 @@ jsonApp.post("/testNotes", function(req, res) {
 });
 
 
+//json post route - update for MongoDB
+jsonApp.post("/testUsers", function(req, res) {
+  console.log(req.body)
+  
+  portfolioObject = JSON.parse(req.body.portfolio);
+  updatedAmount = Number(req.body.amount);
+
+
+  console.log('p object')
+  console.log(portfolioObject)
+
+  console.log('amount')
+  console.log(updatedAmount)
+
+  var newUserObject = { "amount":updatedAmount, 
+                        "portfolio":portfolioObject }
+
+  console.log(newUserObject)
+  res.json({
+    newUserObject
+  });
+
+});
+
+
 
 jsonApp.put("/userAmount", function(req, res) {
   //store new object in req.body
@@ -92,4 +150,3 @@ jsonApp.put("/userAmount", function(req, res) {
     "newUserAmount": user.amount
   });
 });
-

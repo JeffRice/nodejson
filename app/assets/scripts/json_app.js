@@ -54,30 +54,34 @@ function buildTestNotes(response) {
       getTestNotes();
     });
 
+
+
     $("#upAmount").on("click", function() {
-      //get values for new amount
-      var sum = $("#updateInput").val();
-      var pointNum = Number(sum)
-      //put new amount to server
-      $.ajax({
-        url: 'userAmount',
-        type: 'PUT',
-        data: "amount=" + sum,
-        success: function(data) {
-          console.log(data);
-          console.log(sum);
-          console.log('put was performed.');
-          buildPortfolio(data.newUserAmount);
-        }
-      });
+      //get values for new note
+      var value = $("#updateInput").val();
+      var numValue = Number(value);
+      var testPortfolio = [{"symbol": "TSLA", "shares": 18}, {"symbol": "AAPL", "shares": 11}];
+      var jsonPortfolio = JSON.stringify(testPortfolio);
+      //create new note
+      var userObject = { 'portfolio':jsonPortfolio, "amount":numValue };
+      //post new note to server
+      $.post("testUsers", userObject, function (response) {
+        console.log("server post response returned..." + +JSON.stringify(response));
+        console.log(response);
+      })
+      //get notes
+      getTestUsers();
     });
 
-    $.getJSON("user.json", function (userResponse) {
-      console.log("response = "+JSON.stringify(userResponse));
+
+    function getTestUsers() {
+    $.getJSON("testUsers.json", function (userResponse) {
+      console.log("test user response = "+JSON.stringify(userResponse));
       console.log(userResponse);
-      var userAmount = userResponse.amount;
+      var userAmount = userResponse[0].amount;
       buildPortfolio(userAmount);
-    })
+    });
+  }
 
 
       function getTestNotes() {
@@ -91,6 +95,7 @@ function buildTestNotes(response) {
 
       //load notes on page load
       getTestNotes();
+      getTestUsers();
 
 
 
