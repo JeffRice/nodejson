@@ -29,6 +29,7 @@ function buildTestNotes(response) {
 
   function buildPortfolio(userAmount) {
     console.log(userAmount)
+    $(".portfolio-output").empty();
     var p = $("<p>");
     p.html(userAmount);
     $(".portfolio-output").append(p);
@@ -38,7 +39,7 @@ function buildTestNotes(response) {
 
 
 
-
+/*
 
     $(".note-input button").on("click", function() {
       //get values for new note
@@ -48,6 +49,30 @@ function buildTestNotes(response) {
       var newNote = {"created":created, "note":note_text};
       //post new note to server
       $.post("testNotes", newNote, function (response) {
+        console.log("server post response returned..." + +JSON.stringify(response));
+      })
+      //get notes
+      getTestNotes();
+    });
+    */
+
+    $(".note-input button").on("click", function() {
+      //get values for new note
+      var note_text = $(".note-input input").val();
+      var created = new Date();
+      //create new note
+      var newTransaction = {
+        "time": created,
+        "transactionID": 3,
+        "action": "Sell",
+        "symbol": "MSFT",
+        "shares": 43,
+        "price": 8,
+        "action": "Sell",
+        "change": 134.2
+        };
+      //post new note to server
+      $.post("Transactions", newTransaction, function (response) {
         console.log("server post response returned..." + +JSON.stringify(response));
       })
       //get notes
@@ -92,6 +117,8 @@ function buildTestNotes(response) {
           buildTestNotes(response);
         });
         }
+
+
 
       //load notes on page load
       getTestNotes();

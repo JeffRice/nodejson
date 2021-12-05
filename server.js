@@ -19,7 +19,23 @@ var express = require("express"),
   //model note
   var testNote = mongoose.model("testNote", testNoteSchema);
 
-    //define Mongoose schema for testnotes, using specific collection
+
+    //define Mongoose schema for transactions, using specific collection
+    var TransactionSchema = mongoose.Schema({
+      "time": Date,
+      "transactionID": Number,
+      "symbol": String,
+      "shares": Number,
+      "price": Number,
+      "action": String,
+      "change": Number
+    }, { collection : 'testUsers' });
+  
+  
+    //model note
+    var Transaction = mongoose.model("Transaction", TransactionSchema);
+
+    //define Mongoose schema for testuser, using specific collection
     var testUserSchema = mongoose.Schema({
       "userid": Number,
       "amount": Number,
@@ -27,12 +43,37 @@ var express = require("express"),
     }, { collection : 'testUsers' });
   
   
-    //model note
+    //model user
     var testUser = mongoose.model("testUser", testUserSchema);
 
 
-  
+    //create default user if no entries
+    testUser.find({}, function (error, testNotes) {
+      numberOfEntries = testNotes.length;
+      console.log(numberOfEntries)
+      console.log('testNotes')
+      console.log(testNotes)
+      if(numberOfEntries === 0){
+        console.log('empty')
+        var newUser = new testUser({
+          "amount": 10000,
+          "portfolio": [],
+          "userid": 1
+        });
+        newUser.save(function (error, result) {
+        });
+        var newTransaction = new Transaction({
+          "transactionID": 0,
+          "change": 10000
+        });
+        newTransaction.save(function (error, result) {
+        });
 
+      }
+      else {
+        console.log('have entries')
+      }
+     });
 
 
 //set as static file server...
@@ -47,33 +88,19 @@ jsonApp.use(bodyParser.urlencoded({ extended: false }));
 http.createServer(jsonApp).listen(3030);
 
 
-testUser.find({}, function (error, testUsers) {
-  //add some error checking...
-  console.log(error)
-  console.log('testUsersEntry')
-  console.log(testUsers)
-}); 
-
-testNote.find({}, function (error, testNotes) {
-  //add some error checking...
-  numberOfEntries = testNotes.length;
-  console.log(numberOfEntries)
-  console.log('testNotes')
-  console.log(testNotes)
-  if(numberOfEntries === 0){
-    console.log('empty')
-  }
-  else {
-    console.log('have entries')
-  }
- });
-
-
 //json get route - update for mongo
 jsonApp.get("/testNotes.json", function(req, res) {
   testNote.find({ }, function (error, testNotes) {
    //add some error checking...
    res.json(testNotes);
+  });
+});
+
+//json get route - update for mongo
+jsonApp.get("/Transactions.json", function(req, res) {
+  Transaction.find({ }, function (error, Transactions) {
+   //add some error checking...
+   res.json(Transactions);
   });
 });
 
@@ -107,6 +134,53 @@ jsonApp.post("/testNotes", function(req, res) {
   });
 });
 
+//json post route - update for MongoDB
+jsonApp.post("/Transactions", function(req, res) {
+
+  // get the doc with the highest transactionID
+  testUser.find({}).lean().sort([['transactionID', -1]]).limit(1).exec(function(err, docs) { 
+    
+    console.log(docs)
+    
+
+
+      console.log(docs[0]["transactionID"])
+      console.log(docs[0].transactionID)
+        // increment highest transactionID 
+      var newTransactionID = (docs[0].transactionID + 1);
+
+
+ 
+    //new transaction object
+    var newTransaction = new Transaction({
+      "time": req.body.time,
+      "transactionID": newTransactionID,
+      "symbol": req.body.symbol,
+      "shares": req.body.shares,
+      "price": req.body.price,
+      "action": req.body.action,
+      "change": req.body.change
+  });
+
+    //save transaction object
+    newTransaction.save(function (error, result) {
+      if (error !== null) {
+        console.log(error);
+        res.send("error reported");
+      } else {
+        Transaction.find({}, function (error, result) {
+          res.json(result);
+            })
+           }
+     });
+
+
+ });
+
+
+
+});
+
 
 //json post route - update for MongoDB
 jsonApp.post("/testUsers", function(req, res) {
@@ -126,11 +200,6 @@ jsonApp.post("/testUsers", function(req, res) {
                         "portfolio":portfolioObject, "userid": 1 }
 
   console.log(newUserObject)
-
-  testUser.replaceOne(
-    { "userid": 1 },
-    newUserObject
-  )
 
 
   const query = { userid: 1 };
