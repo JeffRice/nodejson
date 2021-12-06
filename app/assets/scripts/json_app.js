@@ -1,33 +1,70 @@
 //load main app logic
 function loadApp() {
   "use strict";
+  var currentPortfolio = [];
 
 
-function buildTestNotes(response) {
+function buildTransactions(response) {
   //get travelNotes
   $(".note-output").empty();
   console.log(response);
-  var $travelNotes = response;
   //process travelNotes array
-  $travelNotes.forEach(function(item) {
+  response.forEach(function(item) {
     console.log(item)
     if (item !== null) {
-      var note = item.note;
-      var created = item.created;
+      var symbol = item.symbol;
+      var created = item.time;
+      var shares = item.shares;
+      var price = item.price;
+      var action = item.action;
+      var change = item.change;
       //create each note's <p>
       var p = $("<p>");
       //add note text
-      p.html(note);
+      p.html(symbol);
       //append to DOM
       $(".note-output").append(p);
-      $(".note-output").append('date item created: ' + created);
+      $(".note-output").append('shares: ' + shares + '|');
+      $(".note-output").append('price: ' + price + '|');
+      $(".note-output").append('action: ' + action + '|');
+      $(".note-output").append('change: ' + change + '|');
+      $(".note-output").append('date item created: ' + created + '');
       var hr = $("<hr />");
       $(".note-output").append(hr);
     }
   });
 }
 
-  function buildPortfolio(userAmount) {
+function buildPortfolio(response) {
+  console.log(response);
+  var stockTotal = 0;
+    response.forEach(function(item) {
+    console.log(item)
+    currentPortfolio.push(item);
+    if (item !== null) {
+      var symbol = item.symbol;
+      var shares = item.shares;
+      var price = 8.4;
+      stockTotal += (shares * price); 
+      //create each note's <p>
+      var p = $("<p>");
+      //add note text
+      p.html(symbol);
+      //append to DOM
+      $(".portfolio-output").append(p);
+      $(".portfolio-output").append('shares: ' + shares + ' | ');
+      $(".portfolio-output").append('symbol: ' + symbol + ' | ');
+      $(".portfolio-output").append('current stock quote: $' + price + ' | ');
+      $(".portfolio-output").append('current stock value: $' + (shares * price));
+      var hr = $("<hr />");
+      $(".portfolio-output").append(hr);
+    }
+  });
+      $(".portfolio-output").prepend('Total Stock Holdings: $' + stockTotal);
+
+}
+
+  function showAmount(userAmount) {
     console.log(userAmount)
     $(".portfolio-output").empty();
     var p = $("<p>");
@@ -38,23 +75,6 @@ function buildTestNotes(response) {
 
 
 
-
-/*
-
-    $(".note-input button").on("click", function() {
-      //get values for new note
-      var note_text = $(".note-input input").val();
-      var created = new Date();
-      //create new note
-      var newNote = {"created":created, "note":note_text};
-      //post new note to server
-      $.post("testNotes", newNote, function (response) {
-        console.log("server post response returned..." + +JSON.stringify(response));
-      })
-      //get notes
-      getTestNotes();
-    });
-    */
 
     $(".note-input button").on("click", function() {
       //get values for new note
@@ -95,34 +115,43 @@ function buildTestNotes(response) {
         console.log(response);
       })
       //get notes
-      getTestUsers();
+      getPortfolio();
     });
 
 
-    function getTestUsers() {
-    $.getJSON("testUsers.json", function (userResponse) {
-      console.log("test user response = "+JSON.stringify(userResponse));
-      console.log(userResponse);
-      var userAmount = userResponse[0].amount;
-      buildPortfolio(userAmount);
+
+    function getTransactions() {
+      $.getJSON("Transactions.json", function (response) {
+        console.log("response = "+JSON.stringify(response));
+        console.log(response);
+   //     buildTestNotes(response);
+          buildTransactions(response);
+      });
+      }
+
+
+    function getPortfolio() {
+    $.getJSON("Portfolio.json", function (response) {
+      console.log("test user response = "+JSON.stringify(response));
+      console.log(response);
+      var userPortfolio = response[0].portfolio;
+      var userAmount = response[0].amount;
+   //   showAmount(userAmount);
+      console.log(userPortfolio);
+      buildPortfolio(userPortfolio);
     });
   }
 
 
-      function getTestNotes() {
-        $.getJSON("testNotes.json", function (response) {
-          console.log("response = "+JSON.stringify(response));
-          console.log(response);
-          console.log(response.travelNotes);
-          buildTestNotes(response);
-        });
-        }
+
 
 
 
       //load notes on page load
-      getTestNotes();
-      getTestUsers();
+      getPortfolio();
+      getTransactions();
+
+      console.log(currentPortfolio);
 
 
 

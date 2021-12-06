@@ -48,11 +48,11 @@ var express = require("express"),
 
 
     //create default user if no entries
-    testUser.find({}, function (error, testNotes) {
-      numberOfEntries = testNotes.length;
+    testUser.find({}, function (error, testUsers) {
+      numberOfEntries = testUsers.length;
       console.log(numberOfEntries)
-      console.log('testNotes')
-      console.log(testNotes)
+      console.log('testUsers')
+      console.log(testUsers)
       if(numberOfEntries === 0){
         console.log('empty')
         var newUser = new testUser({
@@ -72,6 +72,14 @@ var express = require("express"),
       }
       else {
         console.log('have entries')
+
+
+            /*
+        testUser.find({"userid" : 1}).lean().exec(function(err, docObject) {
+          console.log(docObject)
+          console.log(docObject[0].portfolio)
+        });
+        */
       }
      });
 
@@ -98,39 +106,18 @@ jsonApp.get("/testNotes.json", function(req, res) {
 
 //json get route - update for mongo
 jsonApp.get("/Transactions.json", function(req, res) {
-  Transaction.find({ }, function (error, Transactions) {
+
+  Transaction.find({   transactionID: { $gt: 0 }  }, function (error, Transactions) {
    //add some error checking...
    res.json(Transactions);
   });
 });
 
 //json get route - update for mongo
-jsonApp.get("/testUsers.json", function(req, res) {
-  testUser.find({}, function (error, testUsers) {
+jsonApp.get("/Portfolio.json", function(req, res) {
+  testUser.find({ userid: 1 }, function (error, testUsers) {
    //add some error checking...
    res.json(testUsers);
-  });
-});
-
-jsonApp.get("/user.json", function(req, res) {
-  res.json(user);
-});
-
-//json post route - update for MongoDB
-jsonApp.post("/testNotes", function(req, res) {
-  var newNote = new testNote({
-    "created":req.body.created,
-    "note":req.body.note
-  });
-  newNote.save(function (error, result) {
-    if (error !== null) {
-      console.log(error);
-      res.send("error reported");
-    } else {
-      testNote.find({}, function (error, result) {
-        res.json(result);
-      })
-    }
   });
 });
 
