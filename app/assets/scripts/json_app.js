@@ -2,6 +2,7 @@
 function loadApp() {
   "use strict";
   var currentPortfolio = [];
+  var currentQuoteIndex = "";
 
 
 function buildTransactions(response) {
@@ -119,6 +120,51 @@ function buildPortfolio(response) {
     });
 
 
+    $("#sellButton").on("click", function() {
+      //get values for new note
+      var value = $("#sellInput").val();
+      var numValue = Number(value);
+
+      var currentStock = currentPortfolio[currentQuoteIndex];
+      var currentShares = currentStock.shares;
+      console.log(currentStock.shares, currentStock.symbol)
+      //if conditions for sale  are met
+      if (numValue <= currentShares){
+        console.log("ok to sell")
+      }
+      else {
+        console.log("cant sell")
+      }
+      
+      
+      
+      
+      
+      //sell
+      sell();
+
+/*
+      //post new note to server
+      $.post("testUsers", userObject, function (response) {
+        console.log("server post response returned..." + +JSON.stringify(response));
+        console.log(response);
+      })
+*/
+    });
+
+
+    $("#getQuote").on("click", function() {
+      //get values for new note
+      var stockSymbol = $("#quoteInput").val()
+
+
+      getQuote(stockSymbol);
+
+
+
+    });
+
+
 
     function getTransactions() {
       $.getJSON("Transactions.json", function (response) {
@@ -142,6 +188,52 @@ function buildPortfolio(response) {
     });
   }
 
+  function getQuote(stockSymbol) {
+    var newQuote = 8.2;
+    console.log(stockSymbol, newQuote);
+
+    console.log(currentPortfolio);
+    //check if user has any shares of the stock
+
+    //checkSharesOf()
+      var existingShares = 0;
+      currentPortfolio.forEach((element, index) => { 
+        if(stockSymbol === element.symbol){
+          console.log("Match!")
+          console.log("Match at index: " + index)
+          existingShares = element.shares;
+          //updating for user Portfolio object
+          currentQuoteIndex = index;
+          //enable sell
+          enableSell(element);
+        }
+        else {
+          console.log("No Match!")
+        }
+       } )
+       //no shares were found
+    if (existingShares === 0){
+          disableSell(stockSymbol);
+        }
+
+    }
+
+
+
+    function enableSell(portfolioItem) {
+      $("#existingShares").empty();
+      $("#existingShares").append("Current shares of " + portfolioItem.symbol  + ": " + portfolioItem.shares + "</span>");
+    }
+
+    function disableSell(stockSymbol) {
+      $("#existingShares").empty();
+      $("#existingShares").append("Currently own no shares of " + stockSymbol);
+  
+       }
+
+    function buy() {}
+
+    function sell() {}
 
 
 
