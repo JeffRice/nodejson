@@ -200,6 +200,60 @@ jsonApp.post("/testUsers", function(req, res) {
 });
 
 
+//json post route - update for MongoDB
+jsonApp.post("/sell", function(req, res) {
+  console.log(req.body)
+
+ // var sellObject = JSON.parse(req.body.sellAmount);
+ var sellAmount = Number(req.body.sellAmount);
+ var sellingSymbol = req.body.symbol;
+ var existingShares = 0;
+ console.log('sell symbol')
+ console.log(sellingSymbol)
+ console.log('sell amount')
+ console.log(sellAmount)
+ 
+
+
+ // get the doc with the highest transactionID
+  testUser.find({ userid: 1}).lean().exec(function(err, docs) { 
+    
+    var currentPortfolio = docs[0].portfolio;
+    console.log(currentPortfolio)
+
+    currentPortfolio.forEach((element, index) => { 
+      if(sellingSymbol === element.symbol){
+        console.log("Match!")
+        console.log("Match at index: " + index)
+        existingShares = element.shares
+      }
+      else {
+        console.log("No Match!")
+      }
+     } )
+
+     console.log(existingShares)
+
+
+ });
+
+/*
+  var newUserObject = { "amount":updatedAmount, 
+                        "portfolio":portfolioObject, "userid": 1 }
+
+  console.log(newUserObject)
+
+
+  const query = { userid: 1 };
+
+  testUser.findOneAndUpdate(query, newUserObject, {upsert: true}, function(err, doc) {
+    if (err) return res.send(500, {error: err});
+    return res.send('Succesfully saved.');
+});
+ */
+
+});
+
 
 jsonApp.put("/userAmount", function(req, res) {
   //store new object in req.body

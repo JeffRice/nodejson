@@ -127,6 +127,7 @@ function buildPortfolio(response) {
 
       var currentStock = currentPortfolio[currentQuoteIndex];
       var currentShares = currentStock.shares;
+      var sellObject = {'symbol': currentStock.symbol, 'sellAmount': numValue};
       console.log(currentStock.shares, currentStock.symbol)
       //if conditions for sale  are met
       if (numValue <= currentShares){
@@ -143,13 +144,12 @@ function buildPortfolio(response) {
       //sell
       sell();
 
-/*
-      //post new note to server
-      $.post("testUsers", userObject, function (response) {
+      $.post("sell", sellObject, function (response) {
         console.log("server post response returned..." + +JSON.stringify(response));
         console.log(response);
       })
-*/
+      //get notes
+      getPortfolio();
     });
 
 
@@ -222,7 +222,10 @@ function buildPortfolio(response) {
 
     function enableSell(portfolioItem) {
       $("#existingShares").empty();
-      $("#existingShares").append("Current shares of " + portfolioItem.symbol  + ": " + portfolioItem.shares + "</span>");
+      $("#existingShares").append("Current price quote for " + portfolioItem.symbol  + " Stock: $" + 8.2 );
+
+      //add this regardless of enable or disable
+      $("#existingShares").append("<br />You currently own: " + portfolioItem.shares  + " of " + portfolioItem.symbol );
     }
 
     function disableSell(stockSymbol) {
