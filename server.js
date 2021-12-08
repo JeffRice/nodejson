@@ -207,7 +207,7 @@ jsonApp.post("/sell", function(req, res) {
  // var sellObject = JSON.parse(req.body.sellAmount);
  var sellAmount = Number(req.body.sellAmount);
  var sellingSymbol = req.body.symbol;
- var existingShares = 0;
+
  console.log('sell symbol')
  console.log(sellingSymbol)
  console.log('sell amount')
@@ -220,19 +220,61 @@ jsonApp.post("/sell", function(req, res) {
     
     var currentPortfolio = docs[0].portfolio;
     console.log(currentPortfolio)
+    var existingShares = 0;
+    var portfolioIndex = 0;
 
+      //set the existing shares
     currentPortfolio.forEach((element, index) => { 
       if(sellingSymbol === element.symbol){
         console.log("Match!")
         console.log("Match at index: " + index)
+        portfolioIndex = index;
         existingShares = element.shares
       }
       else {
-        console.log("No Match!")
+        console.log("Not a Match!")
       }
      } )
 
      console.log(existingShares)
+
+
+
+     // make sure we have enough shares to sell
+     if(existingShares < sellAmount){
+      console.log('not enough shares')
+     }
+     else{
+      console.log('ok to trade')
+
+
+      var updatedBalance = 100;
+      var updatedShares = 0;
+
+      console.log(currentPortfolio[portfolioIndex]);
+      existingShares = currentPortfolio[portfolioIndex].shares;
+      // subtract sell amount and then add to new portfolio object
+      updatedShares = (existingShares - sellAmount);
+      currentPortfolio[portfolioIndex].shares = updatedShares;
+      console.log(updatedShares);
+    // portfolioObject.push(element);
+
+   
+
+      var newPortfolioObject = { "amount":updatedBalance, 
+      "portfolio":currentPortfolio, "userid": 1 }
+
+      console.log(newPortfolioObject)
+
+
+      const query = { userid: 1 };
+      testUser.findOneAndUpdate(query, newPortfolioObject, {upsert: true}, function(err, doc) {
+        if (err) return res.send(500, {error: err});
+        return res.send('Succesfully saved.');
+    });
+
+     }
+    
 
 
  });
