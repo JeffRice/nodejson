@@ -125,8 +125,7 @@ jsonApp.post("/Transactions", function(req, res) {
       "symbol": req.body.symbol,
       "shares": req.body.shares,
       "price": req.body.price,
-      "action": req.body.action,
-      "change": req.body.change
+      "action": req.body.action
   });
 
     //save transaction object
@@ -140,11 +139,7 @@ jsonApp.post("/Transactions", function(req, res) {
             })
            }
      });
-
-
  });
-
-
 
 });
 

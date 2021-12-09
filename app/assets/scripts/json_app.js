@@ -34,7 +34,6 @@ function buildTransactions(response) {
       $(".note-output").append('shares: ' + shares + '|');
       $(".note-output").append('price: ' + price + '|');
       $(".note-output").append('action: ' + action + '|');
-      $(".note-output").append('change: ' + change + '|');
       $(".note-output").append('date item created: ' + created + '');
       var hr = $("<hr />");
       $(".note-output").append(hr);
@@ -70,7 +69,8 @@ function buildPortfolio(response, balance) {
       $(".portfolio-output").append(hr);
     }
   });
-      $(".portfolio-output").prepend('Total Stock Holdings: $' + stockTotal);
+      $(".portfolio-output").prepend('<br />Total Stock Holdings: $' + stockTotal);
+      $(".portfolio-output").prepend('Account Balance: $' + balance);
 
 }
 
@@ -159,8 +159,26 @@ function buildPortfolio(response, balance) {
         console.log("server post response returned..." + +JSON.stringify(response));
         console.log(response);
       })
-      //get portfolio
       getPortfolio();
+      //get values for new note
+      var created = new Date();
+      //create new transaction object
+      var newTransaction = {
+        "time": created,
+        "action": "Sell",
+        "symbol": currentStock.symbol,
+        "shares": numValue,
+        "price": priceOfTransaction
+        };
+      //post new note to server
+      $.post("Transactions", newTransaction, function (response) {
+        console.log("server post response returned..." + +JSON.stringify(response));
+        getTransactions();
+      })
+      //get notes
+
+
+
     });
 
         $("#buyButton").on("click", function() {
@@ -188,7 +206,7 @@ function buildPortfolio(response, balance) {
 
 
 
-          //sell
+          //buy
           buy();
 
           $.post("buy", buyObject, function (response) {
@@ -197,6 +215,23 @@ function buildPortfolio(response, balance) {
           })
           //get notes
           getPortfolio();
+
+          var created = new Date();
+          //create new transaction object
+          var newTransaction = {
+            "time": created,
+            "action": "Buy",
+            "symbol": currentSymbol,
+            "shares": numValue,
+            "price": priceOfTransaction
+            };
+          //post new note to server
+          $.post("Transactions", newTransaction, function (response) {
+            console.log("server post response returned..." + +JSON.stringify(response));
+
+          })
+          //get notes
+                getTransactions();
         });
 
 
