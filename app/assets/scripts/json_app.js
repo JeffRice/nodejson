@@ -2,8 +2,14 @@
 function loadApp() {
   "use strict";
   var currentPortfolio = [];
+  var currentBalance = 0;
+  var currentQuote = 0;
+  var currentSymbol = '';
   var currentQuoteIndex = "";
 
+function financial(x) {
+  return Number.parseFloat(x).toFixed(2);
+}
 
 function buildTransactions(response) {
   //get travelNotes
@@ -36,8 +42,11 @@ function buildTransactions(response) {
   });
 }
 
-function buildPortfolio(response) {
+function buildPortfolio(response, balance) {
+  $(".portfolio-output").empty();
   console.log(response);
+  console.log('balance = ' + balance);
+  currentBalance = balance;
   var stockTotal = 0;
     response.forEach(function(item) {
     console.log(item)
@@ -56,7 +65,7 @@ function buildPortfolio(response) {
       $(".portfolio-output").append('shares: ' + shares + ' | ');
       $(".portfolio-output").append('symbol: ' + symbol + ' | ');
       $(".portfolio-output").append('current stock quote: $' + price + ' | ');
-      $(".portfolio-output").append('current stock value: $' + (shares * price));
+      $(".portfolio-output").append('current stock value: $' + financial(shares * price));
       var hr = $("<hr />");
       $(".portfolio-output").append(hr);
     }
@@ -127,7 +136,9 @@ function buildPortfolio(response) {
 
       var currentStock = currentPortfolio[currentQuoteIndex];
       var currentShares = currentStock.shares;
-      var sellObject = {'symbol': currentStock.symbol, 'sellAmount': numValue};
+      var priceOfTransaction = financial(numValue * currentQuote);
+
+      var sellObject = {'symbol': currentStock.symbol, 'sellAmount': numValue, 'sellPrice': priceOfTransaction};
       console.log(currentStock.shares, currentStock.symbol)
       //if conditions for sale  are met
       if (numValue <= currentShares){
@@ -148,9 +159,45 @@ function buildPortfolio(response) {
         console.log("server post response returned..." + +JSON.stringify(response));
         console.log(response);
       })
-      //get notes
+      //get portfolio
       getPortfolio();
     });
+
+        $("#buyButton").on("click", function() {
+          //get values for new note
+          var value = $("#buyInput").val();
+          var numValue = Number(value);
+
+          var currentStock = currentPortfolio[currentQuoteIndex];
+          var balance = currentBalance;
+
+          var priceOfTransaction = financial(numValue * currentQuote);
+          console.log(priceOfTransaction)
+          var buyObject = {'symbol': currentSymbol, 'buyAmount': numValue, 'buyPrice': priceOfTransaction};
+
+          //if conditions for sale  are met
+          if (balance > priceOfTransaction){
+            console.log("ok to buy")
+            console.log(buyObject)
+          }
+          else {
+            console.log("cant buy")
+          }
+
+
+
+
+
+          //sell
+          buy();
+
+          $.post("buy", buyObject, function (response) {
+            console.log("server post response returned..." + +JSON.stringify(response));
+            console.log(response);
+          })
+          //get notes
+          getPortfolio();
+        });
 
 
     $("#getQuote").on("click", function() {
@@ -184,7 +231,7 @@ function buildPortfolio(response) {
       var userAmount = response[0].amount;
    //   showAmount(userAmount);
       console.log(userPortfolio);
-      buildPortfolio(userPortfolio);
+      buildPortfolio(userPortfolio, userAmount);
     });
   }
 
@@ -194,7 +241,8 @@ function buildPortfolio(response) {
 
     console.log(currentPortfolio);
     //check if user has any shares of the stock
-
+    currentQuote = newQuote;
+    currentSymbol = stockSymbol;
     //checkSharesOf()
       var existingShares = 0;
       currentPortfolio.forEach((element, index) => { 
