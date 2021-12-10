@@ -145,37 +145,6 @@ jsonApp.post("/Transactions", function(req, res) {
 
 
 //json post route - update for MongoDB
-jsonApp.post("/testUsers", function(req, res) {
-  console.log(req.body)
-
-  portfolioObject = JSON.parse(req.body.portfolio);
-  updatedAmount = Number(req.body.amount);
-
-
-  console.log('p object')
-  console.log(portfolioObject)
-
-  console.log('amount')
-  console.log(updatedAmount)
-
-  var newUserObject = { "amount":updatedAmount, 
-                        "portfolio":portfolioObject, "userid": 1 }
-
-  console.log(newUserObject)
-
-
-  const query = { userid: 1 };
-
-  testUser.findOneAndUpdate(query, newUserObject, {upsert: true}, function(err, doc) {
-    if (err) return res.send(500, {error: err});
-    return res.send('Succesfully saved.');
-  });
- 
-
-});
-
-
-//json post route - update for MongoDB
 jsonApp.post("/buy", function(req, res) {
   console.log(req.body)
 
@@ -308,19 +277,22 @@ jsonApp.post("/sell", function(req, res) {
       console.log('ok to trade')
 
       var updatedBalance = (currentBalance + sellPrice);
-      var updatedShares = 0;
 
       console.log(currentPortfolio[portfolioIndex]);
       existingShares = currentPortfolio[portfolioIndex].shares;
       // subtract sell amount and then add to new portfolio object
-      updatedShares = (existingShares - sellAmount);
+      var updatedShares = (existingShares - sellAmount);
       if(updatedShares === 0) {
       console.log('time to remove this entry');
-      //add code  to remove, after buy is working so I don't have to keep manually re-adding to test
+        currentPortfolio.splice([portfolioIndex], 1)
+
 
       }
-      currentPortfolio[portfolioIndex].shares = updatedShares;
-      console.log(updatedShares);
+      else{
+            currentPortfolio[portfolioIndex].shares = updatedShares;
+            console.log(updatedShares);
+      }
+
     // portfolioObject.push(element);
 
 
