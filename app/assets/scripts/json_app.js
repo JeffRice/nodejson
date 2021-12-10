@@ -14,10 +14,8 @@ function financial(x) {
 function buildTransactions(response) {
   //get travelNotes
   $(".note-output").empty();
-  console.log(response);
-  //process travelNotes array
+  //process transactions array
   response.forEach(function(item) {
-    console.log(item)
     if (item !== null) {
       var symbol = item.symbol;
       var created = item.time;
@@ -43,12 +41,9 @@ function buildTransactions(response) {
 
 function buildPortfolio(response, balance) {
   $(".portfolio-output").empty();
-  console.log(response);
-  console.log('balance = ' + balance);
   currentBalance = balance;
   var stockTotal = 0;
     response.forEach(function(item) {
-    console.log(item)
     currentPortfolio.push(item);
     if (item !== null) {
       var symbol = item.symbol;
@@ -69,64 +64,17 @@ function buildPortfolio(response, balance) {
       $(".portfolio-output").append(hr);
     }
   });
-      $(".portfolio-output").prepend('<br />Total Stock Holdings: $' + stockTotal);
-      $(".portfolio-output").prepend('Account Balance: $' + balance);
+      $(".portfolio-output").prepend('<br />Total Stock Holdings: $' + financial(stockTotal));
+      $(".portfolio-output").prepend('Account Balance: $' + financial(balance));
 
 }
 
   function showAmount(userAmount) {
-    console.log(userAmount)
     $(".portfolio-output").empty();
     var p = $("<p>");
     p.html(userAmount);
     $(".portfolio-output").append(p);
 }
-
-
-
-
-
-    $(".note-input button").on("click", function() {
-      //get values for new note
-      var note_text = $(".note-input input").val();
-      var created = new Date();
-      //create new note
-      var newTransaction = {
-        "time": created,
-        "transactionID": 3,
-        "action": "Sell",
-        "symbol": "MSFT",
-        "shares": 43,
-        "price": 8,
-        "action": "Sell",
-        "change": 134.2
-        };
-      //post new note to server
-      $.post("Transactions", newTransaction, function (response) {
-        console.log("server post response returned..." + +JSON.stringify(response));
-      })
-      //get notes
-      getTestNotes();
-    });
-
-
-
-    $("#upAmount").on("click", function() {
-      //get values for new note
-      var value = $("#updateInput").val();
-      var numValue = Number(value);
-      var testPortfolio = [{"symbol": "TSLA", "shares": 18}, {"symbol": "AAPL", "shares": 11}];
-      var jsonPortfolio = JSON.stringify(testPortfolio);
-      //create new note
-      var userObject = { 'portfolio':jsonPortfolio, "amount":numValue };
-      //post new note to server
-      $.post("testUsers", userObject, function (response) {
-        console.log("server post response returned..." + +JSON.stringify(response));
-        console.log(response);
-      })
-      //get notes
-      getPortfolio();
-    });
 
 
     $("#sellButton").on("click", function() {
@@ -138,7 +86,8 @@ function buildPortfolio(response, balance) {
       var currentShares = currentStock.shares;
       var priceOfTransaction = financial(numValue * currentQuote);
 
-      var sellObject = {'symbol': currentStock.symbol, 'sellAmount': numValue, 'sellPrice': priceOfTransaction};
+
+      var sellObject = {'symbol': currentSymbol, 'sellAmount': numValue, 'sellPrice': priceOfTransaction};
       console.log(currentStock.shares, currentStock.symbol)
       //if conditions for sale  are met
       if (numValue <= currentShares){
@@ -148,91 +97,101 @@ function buildPortfolio(response, balance) {
         console.log("cant sell")
       }
       
-      
-      
-      
-      
+
       //sell
       sell();
 
-      $.post("sell", sellObject, function (response) {
-        console.log("server post response returned..." + +JSON.stringify(response));
-        console.log(response);
-      })
-      getPortfolio();
-      //get values for new note
-      var created = new Date();
-      //create new transaction object
-      var newTransaction = {
-        "time": created,
-        "action": "Sell",
-        "symbol": currentStock.symbol,
-        "shares": numValue,
-        "price": priceOfTransaction
-        };
-      //post new note to server
-      $.post("Transactions", newTransaction, function (response) {
-        console.log("server post response returned..." + +JSON.stringify(response));
-        getTransactions();
-      })
-      //get notes
+
+      return new Promise((resolve, reject) => {
+        $.post("sell", sellObject)
+            .done(function (response) {
+                console.log("server post response returned..." +JSON.stringify(response));
+                //create new transaction object
+                var created = new Date()
+                var newTransaction = {
+                  "time": created,
+                  "action": "Sell",
+                  "symbol": currentSymbol,
+                  "shares": numValue,
+                  "price": priceOfTransaction
+                  }
+                //post new transaction to server
+                addTransaction(newTransaction)
+                resolve(getPortfolio());
+
+            })
+           .fail(function () {
+                reject(alert(`Failed to sell users transactions`));
+            });
+      });
 
 
+ });
 
-    });
+ function addTransaction (newTransaction) {
+   return new Promise((resolve, reject) => {
+     $.post("Transactions", newTransaction)
+         .done(function (response) {
+             console.log("server post response returned..." +JSON.stringify(response));
+             resolve(getTransactions());
+         })
+        .fail(function () {
+             reject(alert(`Failed to fetch users transactions`));
+         });
+   })
+ }
 
-        $("#buyButton").on("click", function() {
-          //get values for new note
-          var value = $("#buyInput").val();
-          var numValue = Number(value);
+ $("#buyButton").on("click", function() {
+   //get values for new note
+   var value = $("#buyInput").val();
+   var numValue = Number(value);
 
-          var currentStock = currentPortfolio[currentQuoteIndex];
-          var balance = currentBalance;
+   var currentStock = currentPortfolio[currentQuoteIndex];
+   var balance = currentBalance;
 
-          var priceOfTransaction = financial(numValue * currentQuote);
-          console.log(priceOfTransaction)
-          var buyObject = {'symbol': currentSymbol, 'buyAmount': numValue, 'buyPrice': priceOfTransaction};
+   var priceOfTransaction = financial(numValue * currentQuote);
+   console.log(priceOfTransaction)
+   var buyObject = {'symbol': currentSymbol, 'buyAmount': numValue, 'buyPrice': priceOfTransaction};
 
-          //if conditions for sale  are met
-          if (balance > priceOfTransaction){
-            console.log("ok to buy")
-            console.log(buyObject)
-          }
-          else {
-            console.log("cant buy")
-          }
+   //if conditions for sale  are met
+   if (balance > priceOfTransaction){
+     console.log("ok to buy")
+     console.log(buyObject)
+   }
+   else {
+     console.log("cant buy")
+   }
+
+   //buy
+   // buy();
+
+     return new Promise((resolve, reject) => {
+        $.post("buy", buyObject)
+           .done(function (response) {
+          console.log("server post response returned..." + JSON.stringify(response));
+          console.log(response);
+                //create new transaction object
+                var created = new Date()
+                var newTransaction = {
+                  "time": created,
+                  "action": "Buy",
+                  "symbol": currentSymbol,
+                  "shares": numValue,
+                  "price": priceOfTransaction
+                  }
+                //post new transaction to server
+                addTransaction(newTransaction)
+            resolve(getPortfolio());
+           })
+
+          .fail(function () {
+              reject(alert(`Failed to fetch users portfolio`));
+          });
+
+   });
 
 
-
-
-
-          //buy
-          buy();
-
-          $.post("buy", buyObject, function (response) {
-            console.log("server post response returned..." + +JSON.stringify(response));
-            console.log(response);
-          })
-          //get notes
-          getPortfolio();
-
-          var created = new Date();
-          //create new transaction object
-          var newTransaction = {
-            "time": created,
-            "action": "Buy",
-            "symbol": currentSymbol,
-            "shares": numValue,
-            "price": priceOfTransaction
-            };
-          //post new note to server
-          $.post("Transactions", newTransaction, function (response) {
-            console.log("server post response returned..." + +JSON.stringify(response));
-
-          })
-          //get notes
-                getTransactions();
-        });
+ });
 
 
     $("#getQuote").on("click", function() {
@@ -249,32 +208,36 @@ function buildPortfolio(response, balance) {
 
 
     function getTransactions() {
-      $.getJSON("Transactions.json", function (response) {
+      return new Promise((resolve, reject) => {
+      $.getJSON("Transactions.json")
+       .done(function (response) {
         console.log("response = "+JSON.stringify(response));
-        console.log(response);
-   //     buildTestNotes(response);
-          buildTransactions(response);
-      });
-      }
+        //     buildTestNotes(response);
+        resolve(buildTransactions(response));
 
+      })
+       .fail(function () {
+           reject(alert(`Failed to fetch users transactions`));
+       });
+    });
+  }
 
     function getPortfolio() {
-    $.getJSON("Portfolio.json", function (response) {
-      console.log("test user response = "+JSON.stringify(response));
-      console.log(response);
-      var userPortfolio = response[0].portfolio;
-      var userAmount = response[0].amount;
-   //   showAmount(userAmount);
-      console.log(userPortfolio);
-      buildPortfolio(userPortfolio, userAmount);
+      return new Promise((resolve, reject) => {
+        $.getJSON("Portfolio.json")
+        .done(function (response) {
+                var userPortfolio = response[0].portfolio;
+                var userAmount = response[0].amount;
+                resolve(buildPortfolio(userPortfolio, userAmount));
+        })
+        .fail(function () {
+            reject(alert(`Failed to fetch users portfolio`));
+        });
     });
   }
 
   function getQuote(stockSymbol) {
     var newQuote = 8.2;
-    console.log(stockSymbol, newQuote);
-
-    console.log(currentPortfolio);
     //check if user has any shares of the stock
     currentQuote = newQuote;
     currentSymbol = stockSymbol;
@@ -282,8 +245,6 @@ function buildPortfolio(response, balance) {
       var existingShares = 0;
       currentPortfolio.forEach((element, index) => { 
         if(stockSymbol === element.symbol){
-          console.log("Match!")
-          console.log("Match at index: " + index)
           existingShares = element.shares;
           //updating for user Portfolio object
           currentQuoteIndex = index;
@@ -321,17 +282,9 @@ function buildPortfolio(response, balance) {
 
     function sell() {}
 
-
-
-
-
       //load notes on page load
       getPortfolio();
       getTransactions();
-
-      console.log(currentPortfolio);
-
-
 
 
 };
