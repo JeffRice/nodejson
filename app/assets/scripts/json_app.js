@@ -101,20 +101,19 @@ function buildPortfolio(response, balance) {
       //sell
       sell();
 
-
+      //create new transaction object
+      var created = new Date()
+      var newTransaction = {
+        "time": created,
+        "action": "Sell",
+        "symbol": currentSymbol,
+        "shares": numValue,
+        "price": priceOfTransaction
+        }
       return new Promise((resolve, reject) => {
         $.post("sell", sellObject)
             .done(function (response) {
                 console.log("server post response returned..." +JSON.stringify(response));
-                //create new transaction object
-                var created = new Date()
-                var newTransaction = {
-                  "time": created,
-                  "action": "Sell",
-                  "symbol": currentSymbol,
-                  "shares": numValue,
-                  "price": priceOfTransaction
-                  }
                 //post new transaction to server
                 addTransaction(newTransaction)
                 resolve(getPortfolio());
@@ -165,22 +164,24 @@ function buildPortfolio(response, balance) {
    //buy
    // buy();
 
+    //create new transaction object
+    var created = new Date()
+    var newTransaction = {
+      "time": created,
+      "action": "Buy",
+      "symbol": currentSymbol,
+      "shares": numValue,
+      "price": priceOfTransaction
+      }
+
      return new Promise((resolve, reject) => {
         $.post("buy", buyObject)
            .done(function (response) {
           console.log("server post response returned..." + JSON.stringify(response));
           console.log(response);
-                //create new transaction object
-                var created = new Date()
-                var newTransaction = {
-                  "time": created,
-                  "action": "Buy",
-                  "symbol": currentSymbol,
-                  "shares": numValue,
-                  "price": priceOfTransaction
-                  }
+
                 //post new transaction to server
-                addTransaction(newTransaction)
+            addTransaction(newTransaction)
             resolve(getPortfolio());
            })
 
