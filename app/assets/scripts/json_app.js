@@ -1,11 +1,11 @@
 //load main app logic
 function loadApp() {
   "use strict";
-  var currentPortfolio = [];
-  var currentBalance = 0;
-  var currentQuote = 0;
-  var currentSymbol = '';
-  var currentQuoteIndex = "";
+  let currentPortfolio = [];
+  let currentBalance = 0;
+  let currentQuote = 0;
+  let currentSymbol = '';
+  let currentQuoteIndex = '';
 
 function financial(x) {
   return Number.parseFloat(x).toFixed(2);
@@ -17,14 +17,14 @@ function buildTransactions(response) {
   //process transactions array
   response.forEach(function(item) {
     if (item !== null) {
-      var symbol = item.symbol;
-      var created = item.time;
-      var shares = item.shares;
-      var price = item.price;
-      var action = item.action;
-      var change = item.change;
+      let symbol = item.symbol;
+      let created = item.time;
+      let shares = item.shares;
+      let price = item.price;
+      let action = item.action;
+      let change = item.change;
       //create each note's <p>
-      var p = $("<p>");
+      const p = $("<p>");
       //add note text
       p.html(symbol);
       //append to DOM
@@ -33,7 +33,7 @@ function buildTransactions(response) {
       $(".note-output").append('price: ' + price + '|');
       $(".note-output").append('action: ' + action + '|');
       $(".note-output").append('date item created: ' + created + '');
-      var hr = $("<hr />");
+      const hr = $("<hr />");
       $(".note-output").append(hr);
     }
   });
@@ -42,16 +42,16 @@ function buildTransactions(response) {
 function buildPortfolio(response, balance) {
   $(".portfolio-output").empty();
   currentBalance = balance;
-  var stockTotal = 0;
+  let stockTotal = 0;
     response.forEach(function(item) {
     currentPortfolio.push(item);
     if (item !== null) {
-      var symbol = item.symbol;
-      var shares = item.shares;
-      var price = 8.4;
+      let symbol = item.symbol;
+      let shares = item.shares;
+      let price = 8.4;
       stockTotal += (shares * price); 
       //create each note's <p>
-      var p = $("<p>");
+      const p = $("<p>");
       //add note text
       p.html(symbol);
       //append to DOM
@@ -60,7 +60,7 @@ function buildPortfolio(response, balance) {
       $(".portfolio-output").append('symbol: ' + symbol + ' | ');
       $(".portfolio-output").append('current stock quote: $' + price + ' | ');
       $(".portfolio-output").append('current stock value: $' + financial(shares * price));
-      var hr = $("<hr />");
+      const hr = $("<hr />");
       $(".portfolio-output").append(hr);
     }
   });
@@ -71,7 +71,7 @@ function buildPortfolio(response, balance) {
 
   function showAmount(userAmount) {
     $(".portfolio-output").empty();
-    var p = $("<p>");
+    const p = $("<p>");
     p.html(userAmount);
     $(".portfolio-output").append(p);
 }
@@ -79,15 +79,15 @@ function buildPortfolio(response, balance) {
 
     $("#sellButton").on("click", function() {
       //get values for new note
-      var value = $("#sellInput").val();
-      var numValue = Number(value);
+      let value = $("#sellInput").val();
+      let numValue = Number(value);
 
-      var currentStock = currentPortfolio[currentQuoteIndex];
-      var currentShares = currentStock.shares;
-      var priceOfTransaction = financial(numValue * currentQuote);
+      let currentStock = currentPortfolio[currentQuoteIndex];
+      let currentShares = currentStock.shares;
+      let priceOfTransaction = financial(numValue * currentQuote);
 
 
-      var sellObject = {'symbol': currentSymbol, 'sellAmount': numValue, 'sellPrice': priceOfTransaction};
+      let sellObject = {'symbol': currentSymbol, 'sellAmount': numValue, 'sellPrice': priceOfTransaction};
       console.log(currentStock.shares, currentStock.symbol)
       //if conditions for sale  are met
       if (numValue <= currentShares){
@@ -102,8 +102,8 @@ function buildPortfolio(response, balance) {
       sell();
 
       //create new transaction object
-      var created = new Date()
-      var newTransaction = {
+      let created = new Date()
+      let newTransaction = {
         "time": created,
         "action": "Sell",
         "symbol": currentSymbol,
@@ -142,15 +142,15 @@ function buildPortfolio(response, balance) {
 
  $("#buyButton").on("click", function() {
    //get values for new note
-   var value = $("#buyInput").val();
-   var numValue = Number(value);
+   let value = $("#buyInput").val();
+   let numValue = Number(value);
 
-   var currentStock = currentPortfolio[currentQuoteIndex];
-   var balance = currentBalance;
+   let currentStock = currentPortfolio[currentQuoteIndex];
+   let balance = currentBalance;
 
-   var priceOfTransaction = financial(numValue * currentQuote);
+   let priceOfTransaction = financial(numValue * currentQuote);
    console.log(priceOfTransaction)
-   var buyObject = {'symbol': currentSymbol, 'buyAmount': numValue, 'buyPrice': priceOfTransaction};
+   let buyObject = {'symbol': currentSymbol, 'buyAmount': numValue, 'buyPrice': priceOfTransaction};
 
    //if conditions for sale  are met
    if (balance > priceOfTransaction){
@@ -165,8 +165,8 @@ function buildPortfolio(response, balance) {
    // buy();
 
     //create new transaction object
-    var created = new Date()
-    var newTransaction = {
+    let created = new Date()
+    let newTransaction = {
       "time": created,
       "action": "Buy",
       "symbol": currentSymbol,
@@ -197,13 +197,8 @@ function buildPortfolio(response, balance) {
 
     $("#getQuote").on("click", function() {
       //get values for new note
-      var stockSymbol = $("#quoteInput").val()
-
-
+      let stockSymbol = $("#quoteInput").val()
       getQuote(stockSymbol);
-
-
-
     });
 
 
@@ -215,7 +210,6 @@ function buildPortfolio(response, balance) {
         console.log("response = "+JSON.stringify(response));
         //     buildTestNotes(response);
         resolve(buildTransactions(response));
-
       })
        .fail(function () {
            reject(alert(`Failed to fetch users transactions`));
@@ -227,8 +221,8 @@ function buildPortfolio(response, balance) {
       return new Promise((resolve, reject) => {
         $.getJSON("Portfolio.json")
         .done(function (response) {
-                var userPortfolio = response[0].portfolio;
-                var userAmount = response[0].amount;
+                let userPortfolio = response[0].portfolio;
+                let userAmount = response[0].amount;
                 resolve(buildPortfolio(userPortfolio, userAmount));
         })
         .fail(function () {
@@ -238,12 +232,12 @@ function buildPortfolio(response, balance) {
   }
 
   function getQuote(stockSymbol) {
-    var newQuote = 8.2;
+    const newQuote = 8.2;
     //check if user has any shares of the stock
     currentQuote = newQuote;
     currentSymbol = stockSymbol;
     //checkSharesOf()
-      var existingShares = 0;
+      let existingShares = 0;
       currentPortfolio.forEach((element, index) => { 
         if(stockSymbol === element.symbol){
           existingShares = element.shares;
