@@ -197,8 +197,8 @@ function buildPortfolio(response, balance) {
 
     $("#getQuote").on("click", function() {
       //get values for new note
-      let stockSymbol = $("#quoteInput").val()
-      getQuote(stockSymbol);
+      let stockSymbol = $("#quoteInput").val();
+      getQuote(stockSymbol.toUpperCase());
     });
 
 
