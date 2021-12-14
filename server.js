@@ -1,15 +1,15 @@
-var express = require("express"),
+let express = require("express"),
     http = require("http"),
     bodyParser = require("body-parser"),
     jsonApp = express();
     mongoose = require('mongoose');
 
-    var mongoDB = 'mongodb://127.0.0.1/testdb2';
+    const mongoDB = 'mongodb://127.0.0.1/testdb2';
     mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true});
 
 
     //define Mongoose schema for transactions, using specific collection
-    var TransactionSchema = mongoose.Schema({
+    const TransactionSchema = mongoose.Schema({
       "time": Date,
       "transactionID": Number,
       "symbol": String,
@@ -21,10 +21,10 @@ var express = require("express"),
   
   
     //model transaction
-    var Transaction = mongoose.model("Transaction", TransactionSchema);
+    const Transaction = mongoose.model("Transaction", TransactionSchema);
 
     //define Mongoose schema for testuser, using specific collection
-    var testUserSchema = mongoose.Schema({
+    const testUserSchema = mongoose.Schema({
       "userid": Number,
       "amount": Number,
       "portfolio": Array
@@ -32,7 +32,7 @@ var express = require("express"),
   
   
     //model user
-    var testUser = mongoose.model("testUser", testUserSchema);
+    const testUser = mongoose.model("testUser", testUserSchema);
 
 
     //create default user if no entries
@@ -43,14 +43,14 @@ var express = require("express"),
       console.log(testUsers)
       if(numberOfEntries === 0){
         console.log('empty')
-        var newUser = new testUser({
+        const newUser = new testUser({
           "amount": 10000,
           "portfolio": [],
           "userid": 1
         });
         newUser.save(function (error, result) {
         });
-        var newTransaction = new Transaction({
+        const newTransaction = new Transaction({
           "transactionID": 0,
           "change": 10000
         });
@@ -107,19 +107,13 @@ jsonApp.post("/Transactions", function(req, res) {
   // get the doc with the highest transactionID
   testUser.find({}).lean().sort([['transactionID', -1]]).limit(1).exec(function(err, docs) { 
     
-    console.log(docs)
-    
-
-
-      console.log(docs[0]["transactionID"])
-      console.log(docs[0].transactionID)
-        // increment highest transactionID 
-      var newTransactionID = (docs[0].transactionID + 1);
+        // increment highest transactionID
+      const newTransactionID = (docs[0].transactionID + 1);
 
 
  
     //new transaction object
-    var newTransaction = new Transaction({
+    const newTransaction = new Transaction({
       "time": req.body.time,
       "transactionID": newTransactionID,
       "symbol": req.body.symbol,
@@ -149,9 +143,9 @@ jsonApp.post("/buy", function(req, res) {
   console.log(req.body)
 
 
- var buyAmount = Number(req.body.buyAmount);
- var buyingSymbol = req.body.symbol;
- var buyPrice = Number(req.body.buyPrice);
+ const buyAmount = Number(req.body.buyAmount);
+ const buyingSymbol = req.body.symbol;
+ const buyPrice = Number(req.body.buyPrice);
  console.log('buy symbol')
  console.log(buyingSymbol)
  console.log('buy amount')
@@ -164,11 +158,11 @@ jsonApp.post("/buy", function(req, res) {
  // get the doc with the highest transactionID
   testUser.find({ userid: 1}).lean().exec(function(err, docs) { 
     
-    var currentPortfolio = docs[0].portfolio;
+    let currentPortfolio = docs[0].portfolio;
     console.log(currentPortfolio)
-    var existingShares = 0;
-    var portfolioIndex = 0;
-    var currentBalance = docs[0].amount;
+    let existingShares = 0;
+    let portfolioIndex = 0;
+    let currentBalance = docs[0].amount;
 
       //set the existing shares
     currentPortfolio.forEach((element, index) => { 
@@ -191,8 +185,8 @@ jsonApp.post("/buy", function(req, res) {
      }
      else{
       console.log('ok to trade')
-      var updatedBalance = (currentBalance - buyPrice);
-      var updatedShares = (existingShares + buyAmount);
+      let updatedBalance = (currentBalance - buyPrice);
+      let updatedShares = (existingShares + buyAmount);
 
 
       if(existingShares != 0){
@@ -203,11 +197,11 @@ jsonApp.post("/buy", function(req, res) {
         }
         else{
         //add new item to currentPortfolio
-        var newItem = {'shares': updatedShares, 'symbol': buyingSymbol,}
+        const newItem = {'shares': updatedShares, 'symbol': buyingSymbol,}
         currentPortfolio.push(newItem);
         }
 
-      var newPortfolioObject = { "amount":updatedBalance,
+      const newPortfolioObject = { "amount":updatedBalance,
       "portfolio":currentPortfolio, "userid": 1 }
 
       console.log('new portfolio: ', newPortfolioObject)
@@ -231,10 +225,10 @@ jsonApp.post("/buy", function(req, res) {
 jsonApp.post("/sell", function(req, res) {
   console.log(req.body)
 
- // var sellObject = JSON.parse(req.body.sellAmount);
- var sellAmount = Number(req.body.sellAmount);
- var sellingSymbol = req.body.symbol;
- var sellPrice = Number(req.body.sellPrice);
+ // let sellObject = JSON.parse(req.body.sellAmount);
+ const sellAmount = Number(req.body.sellAmount);
+ const sellingSymbol = req.body.symbol;
+ const sellPrice = Number(req.body.sellPrice);
 
 
  console.log('sell symbol')
@@ -248,11 +242,11 @@ jsonApp.post("/sell", function(req, res) {
  // get the doc with the highest transactionID
   testUser.find({ userid: 1}).lean().exec(function(err, docs) {
 
-    var currentBalance = docs[0].amount;
-    var currentPortfolio = docs[0].portfolio;
+    let currentBalance = docs[0].amount;
+    let currentPortfolio = docs[0].portfolio;
     console.log(currentPortfolio)
-    var existingShares = 0;
-    var portfolioIndex = 0;
+    let existingShares = 0;
+    let portfolioIndex = 0;
 
       //set the existing shares
     currentPortfolio.forEach((element, index) => {
@@ -276,12 +270,12 @@ jsonApp.post("/sell", function(req, res) {
      else{
       console.log('ok to trade')
 
-      var updatedBalance = (currentBalance + sellPrice);
+      let updatedBalance = (currentBalance + sellPrice);
 
       console.log(currentPortfolio[portfolioIndex]);
       existingShares = currentPortfolio[portfolioIndex].shares;
       // subtract sell amount and then add to new portfolio object
-      var updatedShares = (existingShares - sellAmount);
+      let updatedShares = (existingShares - sellAmount);
       if(updatedShares === 0) {
       console.log('time to remove this entry');
         currentPortfolio.splice([portfolioIndex], 1)
@@ -297,7 +291,7 @@ jsonApp.post("/sell", function(req, res) {
 
 
 
-      var newPortfolioObject = { "amount":updatedBalance,
+      const newPortfolioObject = { "amount":updatedBalance,
       "portfolio":currentPortfolio, "userid": 1 }
 
       console.log(newPortfolioObject)
@@ -318,7 +312,7 @@ jsonApp.post("/sell", function(req, res) {
 
 jsonApp.put("/userAmount", function(req, res) {
   //store new object in req.body
-  var updatedUserAmount = req.body.amount;
+  const updatedUserAmount = req.body.amount;
   console.log(req.body)
   console.log(req.body.amount)
   console.log(user)
