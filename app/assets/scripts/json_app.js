@@ -1,3 +1,5 @@
+  import { financial as financial } from './financial.js';
+
 //load main app logic
 function loadApp() {
   "use strict";
@@ -6,10 +8,15 @@ function loadApp() {
   let currentQuote = 0;
   let currentSymbol = '';
   let currentQuoteIndex = '';
+ // const financial = require('./financial');
 
+
+
+/*
 function financial(x) {
   return Number.parseFloat(x).toFixed(2);
 }
+*/
 
 function buildTransactions(response) {
   //get travelNotes
@@ -282,5 +289,8 @@ function buildPortfolio(response, balance) {
       getTransactions();
 
 
+
 };
 $(document).ready(loadApp);
+
+
