@@ -3,6 +3,7 @@ const express = require("express"),
     bodyParser = require("body-parser"),
     jsonApp = express();
     mongoose = require('mongoose');
+    requirejs = require('requirejs');
 
     const mongoDB = 'mongodb://127.0.0.1/testdb2';
     mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true});

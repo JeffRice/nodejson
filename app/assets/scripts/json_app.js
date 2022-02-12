@@ -1,4 +1,4 @@
-  import { financial as financial } from './financial.js';
+ // import * as financial from './financial.js';
 
 //load main app logic
 function loadApp() {
@@ -8,15 +8,8 @@ function loadApp() {
   let currentQuote = 0;
   let currentSymbol = '';
   let currentQuoteIndex = '';
- // const financial = require('./financial');
 
 
-
-/*
-function financial(x) {
-  return Number.parseFloat(x).toFixed(2);
-}
-*/
 
 function buildTransactions(response) {
   //get travelNotes
@@ -37,7 +30,7 @@ function buildTransactions(response) {
       //append to DOM
       $(".note-output").append(p);
       $(".note-output").append('shares: ' + shares + '|');
-      $(".note-output").append('price: ' + price + '|');
+      $(".note-output").append('price: ' + financial(price) + '|');
       $(".note-output").append('action: ' + action + '|');
       $(".note-output").append('date item created: ' + created + '');
       const hr = $("<hr />");
@@ -65,7 +58,7 @@ function buildPortfolio(response, balance) {
       $(".portfolio-output").append(p);
       $(".portfolio-output").append('shares: ' + shares + ' | ');
       $(".portfolio-output").append('symbol: ' + symbol + ' | ');
-      $(".portfolio-output").append('current stock quote: $' + price + ' | ');
+      $(".portfolio-output").append('current stock quote: $' + financial(price) + ' | ');
       $(".portfolio-output").append('current stock value: $' + financial(shares * price));
       const hr = $("<hr />");
       $(".portfolio-output").append(hr);
@@ -290,7 +283,17 @@ function buildPortfolio(response, balance) {
 
 
 
+
 };
+
+function financial(x) {
+  return Number.parseFloat(x).toFixed(2);
+}
+// module.exports = financial;
+
+
+
+
 $(document).ready(loadApp);
 
 
