@@ -7,8 +7,7 @@
     "body-parser": "^1.14.1",
     "express": "^4.13.3",
     "finnhub": "^1.2.8",
-    "mongoose": "^4.13.21",
-    "requirejs": "^2.3.6"
+    "mongoose": "^4.13.21"
   },
   "author": "Jeff Rice",
   "devDependencies": {
