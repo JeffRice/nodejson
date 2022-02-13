@@ -289,11 +289,17 @@ function buildPortfolio(response, balance) {
 function financial(x) {
   return Number.parseFloat(x).toFixed(2);
 }
-// module.exports = financial;
 
-
-
-
+if (typeof exports !== 'undefined') {
+    module.exports =  financial ;
+}
+else {
 $(document).ready(loadApp);
+}
+
+
+
+
+
 
 
