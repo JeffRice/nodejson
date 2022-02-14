@@ -69,12 +69,7 @@ function buildPortfolio(response, balance) {
 
 }
 
-  function showAmount(userAmount) {
-    $(".portfolio-output").empty();
-    const p = $("<p>");
-    p.html(userAmount);
-    $(".portfolio-output").append(p);
-}
+
 
 
     $("#sellButton").on("click", function() {
@@ -290,8 +285,20 @@ function financial(x) {
   return Number.parseFloat(x).toFixed(2);
 }
 
+function tester(a, b) {
+  return a + b;
+}
+  function showAmount(userAmount) {
+    $(".portfolio-output").empty();
+    const p = $("<p>");
+    p.html(userAmount);
+    $(".portfolio-output").append(p);
+}
+
 if (typeof exports !== 'undefined') {
-    module.exports =  financial ;
+
+exports.financial = financial;
+exports.tester = tester;
 }
 else {
 $(document).ready(loadApp);
