@@ -1,5 +1,6 @@
  // import * as financial from './financial.js';
 
+
 //load main app logic
 function loadApp() {
   "use strict";
@@ -299,6 +300,7 @@ if (typeof exports !== 'undefined') {
 
 exports.financial = financial;
 exports.tester = tester;
+exports.showAmount = showAmount;
 }
 else {
 $(document).ready(loadApp);

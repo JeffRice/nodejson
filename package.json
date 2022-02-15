@@ -7,13 +7,22 @@
     "body-parser": "^1.14.1",
     "express": "^4.13.3",
     "finnhub": "^1.2.8",
-    "mongoose": "^4.13.21"
+    "mongoose": "^4.13.21",
+    "util": "^0.12.4",
+    "whatwg-url": "^11.0.0"
   },
   "author": "Jeff Rice",
   "devDependencies": {
-    "jest": "^27.4.5"
+    "jest": "^27.5.1",
+    "jquery": "^3.6.0",
+    "jsdom": "^19.0.0"
   },
   "scripts": {
     "test": "jest"
+  },
+  "jest": {
+    "setupFiles": [
+      "./app/assets/scripts/setup-jest.js"
+    ]
   }
 }
