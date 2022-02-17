@@ -13,6 +13,9 @@
   },
   "author": "Jeff Rice",
   "devDependencies": {
+    "@babel/core": "^7.17.5",
+    "@babel/preset-env": "^7.16.11",
+    "babel-jest": "^27.5.1",
     "jest": "^27.5.1",
     "jquery": "^3.6.0",
     "jsdom": "^19.0.0"

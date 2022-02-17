@@ -35,19 +35,17 @@ function tester(a, b) {
     $(".portfolio-output").append(p);
 }
 
+const portport = [
+                       { symbol: 'MSFT', shares: 164 },
+                       { symbol: 'AMZN', shares: 48 },
+                       { symbol: 'TSLA', shares: 22 }
+                     ];
+
+
+
     function getPortfolio() {
-    console.log('fetching data');
-      return new Promise((resolve, reject) => {
-        $.getJSON("Portfolio.json")
-        .done(function (response) {
-                let userPortfolio = response[0].portfolio;
-                let userAmount = response[0].amount;
-                resolve(buildPortfolio(userPortfolio, userAmount));
-        })
-        .fail(function () {
-            reject(console.log('Failed to get portfolio'));
-        });
-    });
+    console.log('Mock Testing Data');
+return Promise.resolve(portport);
   }
 
   function buildPortfolio(response, balance) {
